@@ -8,6 +8,8 @@ import javafx.fxml.FXML;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 
+import java.util.Vector;
+
 public class Controller {
 
     @FXML
@@ -16,10 +18,14 @@ public class Controller {
     @FXML
     private TextArea receiveField;
 
+    private Vector<String> vector = null;
+    private int current = 0;
+
     private SerialPort comPort = SerialPort.getCommPorts()[0];
 
     public void initialize(){
         comPort.openPort();
+        comPort.setBaudRate(57600);
 
         comPort.addDataListener(new SerialPortDataListener() {
             @Override
@@ -33,7 +39,10 @@ public class Controller {
                 StringBuilder message = new StringBuilder();
 
                 for (byte data : getData) {
-                    message.append((char) data);
+                    String hex = String.format("%02x", data);
+
+                    message.append(hex);
+                    vector.add(hex);
                 }
 
                 String oldMessage = receiveField.getText();
@@ -47,17 +56,41 @@ public class Controller {
     @FXML
     public void send(javafx.event.ActionEvent actionEvent){
 
+        beforeWrite();
+
         String sendText = sendField.getText();
         comPort.writeBytes(sendText.getBytes(), sendText.getBytes().length);
+
+        afterWrite();
     }
 
     @FXML
     public void reset(javafx.event.ActionEvent actionEvent){
 
-        String resetCode = "02003C3C00";
+        String resetCode = "30323030334333433030"; //02003C3C00 w 0x
 
-        sendField.setText(resetCode);
+        beforeWrite();
         comPort.writeBytes(resetCode.getBytes(), resetCode.getBytes().length);
+        afterWrite();
+    }
+
+    private void beforeWrite(){
+
+        comPort.setRTS();
+        comPort.setDTR();
+
+        try {
+            Thread.sleep(10);
+
+        } catch(Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void afterWrite(){
+
+        comPort.clearRTS();
+        comPort.clearDTR();
     }
 
     /* TODO: get all ports names
