@@ -5,15 +5,33 @@ import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
 import javafx.fxml.FXML;
+import javafx.scene.control.Button;
+import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 
+import java.util.List;
 import java.util.Vector;
 
 public class Controller {
 
     @FXML
+    private ComboBox<SerialPort> ports;
+
+    @FXML
+    private Button connectButton;
+
+    @FXML
+    private Button disconnectButton;
+
+    @FXML
     private TextField sendField;
+
+    @FXML
+    private Button sendButton;
+
+    @FXML
+    private Button resetButton;
 
     @FXML
     private TextArea receiveField;
@@ -22,10 +40,22 @@ public class Controller {
     private int current = 0;
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
+    List<String> allPortsList;
 
     public void initialize(){
-        comPort.openPort();
-        comPort.setBaudRate(57600);
+
+        disconnectButton.setDisable(true);
+        sendButton.setDisable(true);
+        resetButton.setDisable(true);
+
+        SerialPort[] allPorts = SerialPort.getCommPorts();
+        
+        for(SerialPort serialPort : allPorts){
+            allPortsList.add(serialPort.getDescriptivePortName());
+        }
+
+        //ObservableList<SerialPort> allPortsObservList = FXCollections.observableArrayList(allPortsList);
+        //ports.setItems(allPortsList);
 
         comPort.addDataListener(new SerialPortDataListener() {
             @Override
@@ -51,6 +81,30 @@ public class Controller {
                 receiveField.setText(newMessage);
             }
         });
+    }
+
+    @FXML
+    public void connect(javafx.event.ActionEvent actionEvent) {
+        SerialPort chosenPort = ports.getValue();
+
+        if (chosenPort != null) {
+            comPort = ports.getValue();
+            comPort.openPort();
+            comPort.setBaudRate(57600);
+
+            disconnectButton.setDisable(false);
+            sendButton.setDisable(false);
+            resetButton.setDisable(false);
+        }
+    }
+
+    @FXML
+    public void disconnect(javafx.event.ActionEvent actionEvent) {
+        comPort.closePort();
+
+        disconnectButton.setDisable(true);
+        sendButton.setDisable(true);
+        resetButton.setDisable(true);
     }
 
     @FXML
@@ -92,9 +146,4 @@ public class Controller {
         comPort.clearRTS();
         comPort.clearDTR();
     }
-
-    /* TODO: get all ports names
-    SerialPort[] ports = SerialPort.getCommPorts();
-    for (SerialPort port: ports)
-        System.out.println(port.getSystemPortName());*/
 }
