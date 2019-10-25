@@ -4,13 +4,14 @@ import com.fazecast.jSerialComm.SerialPort;
 import com.fazecast.jSerialComm.SerialPortDataListener;
 import com.fazecast.jSerialComm.SerialPortEvent;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 
-import java.util.List;
 import java.util.Vector;
 
 public class Controller {
@@ -40,22 +41,14 @@ public class Controller {
     private int current = 0;
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
-    List<String> allPortsList;
 
     public void initialize(){
 
-        disconnectButton.setDisable(true);
-        sendButton.setDisable(true);
-        resetButton.setDisable(true);
+        setButtonsDisable(true);
 
         SerialPort[] allPorts = SerialPort.getCommPorts();
-        
-        for(SerialPort serialPort : allPorts){
-            allPortsList.add(serialPort.getDescriptivePortName());
-        }
-
-        //ObservableList<SerialPort> allPortsObservList = FXCollections.observableArrayList(allPortsList);
-        //ports.setItems(allPortsList);
+        ObservableList<SerialPort> allPortsObservList = FXCollections.observableArrayList(allPorts);
+        ports.setItems(allPortsObservList);
 
         comPort.addDataListener(new SerialPortDataListener() {
             @Override
@@ -84,7 +77,7 @@ public class Controller {
     }
 
     @FXML
-    public void connect(javafx.event.ActionEvent actionEvent) {
+    public void connect() {
         SerialPort chosenPort = ports.getValue();
 
         if (chosenPort != null) {
@@ -92,23 +85,19 @@ public class Controller {
             comPort.openPort();
             comPort.setBaudRate(57600);
 
-            disconnectButton.setDisable(false);
-            sendButton.setDisable(false);
-            resetButton.setDisable(false);
+            setButtonsDisable(false);
         }
     }
 
     @FXML
-    public void disconnect(javafx.event.ActionEvent actionEvent) {
-        comPort.closePort();
+    public void disconnect() {
 
-        disconnectButton.setDisable(true);
-        sendButton.setDisable(true);
-        resetButton.setDisable(true);
+        comPort.closePort();
+        setButtonsDisable(true);
     }
 
     @FXML
-    public void send(javafx.event.ActionEvent actionEvent){
+    public void send(){
 
         beforeWrite();
 
@@ -119,13 +108,22 @@ public class Controller {
     }
 
     @FXML
-    public void reset(javafx.event.ActionEvent actionEvent){
+    public void reset(){
 
         String resetCode = "30323030334333433030"; //02003C3C00 w 0x
 
         beforeWrite();
         comPort.writeBytes(resetCode.getBytes(), resetCode.getBytes().length);
         afterWrite();
+    }
+
+    private void setButtonsDisable(boolean bool){
+
+        ports.setDisable(!bool);
+        connectButton.setDisable(!bool);
+        disconnectButton.setDisable(bool);
+        sendButton.setDisable(bool);
+        resetButton.setDisable(bool);
     }
 
     private void beforeWrite(){
