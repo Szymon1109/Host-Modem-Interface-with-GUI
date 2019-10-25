@@ -14,6 +14,9 @@ import javafx.scene.control.TextArea;
 
 import java.util.Vector;
 
+import static com.fazecast.jSerialComm.SerialPort.EVEN_PARITY;
+import static com.fazecast.jSerialComm.SerialPort.ONE_STOP_BIT;
+
 public class Controller {
 
     @FXML
@@ -81,9 +84,10 @@ public class Controller {
         SerialPort chosenPort = ports.getValue();
 
         if (chosenPort != null) {
-            comPort = ports.getValue();
+            comPort = chosenPort;
+
+            comPort.setComPortParameters(57600, 7, ONE_STOP_BIT, EVEN_PARITY);
             comPort.openPort();
-            comPort.setBaudRate(57600);
 
             setButtonsDisable(false);
         }
