@@ -14,8 +14,7 @@ import javafx.scene.control.TextArea;
 
 import java.util.Vector;
 
-import static com.fazecast.jSerialComm.SerialPort.EVEN_PARITY;
-import static com.fazecast.jSerialComm.SerialPort.ONE_STOP_BIT;
+import static com.fazecast.jSerialComm.SerialPort.*;
 
 public class Controller {
 
@@ -40,7 +39,7 @@ public class Controller {
     @FXML
     private TextArea receiveField;
 
-    private Vector<String> vector = null;
+    private Vector<String> vector = new Vector<>();
     private int current = 0;
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
@@ -52,31 +51,6 @@ public class Controller {
         SerialPort[] allPorts = SerialPort.getCommPorts();
         ObservableList<SerialPort> allPortsObservList = FXCollections.observableArrayList(allPorts);
         ports.setItems(allPortsObservList);
-
-        comPort.addDataListener(new SerialPortDataListener() {
-            @Override
-            public int getListeningEvents() {
-                return SerialPort.LISTENING_EVENT_DATA_RECEIVED; }
-
-            @Override
-            public void serialEvent(SerialPortEvent event) {
-                byte[] getData = event.getReceivedData();
-
-                StringBuilder message = new StringBuilder();
-
-                for (byte data : getData) {
-                    String hex = String.format("%02x", data);
-
-                    message.append(hex);
-                    vector.add(hex);
-                }
-
-                String oldMessage = receiveField.getText();
-                String newMessage = oldMessage + message + "\n";
-
-                receiveField.setText(newMessage);
-            }
-        });
     }
 
     @FXML
@@ -86,8 +60,33 @@ public class Controller {
         if (chosenPort != null) {
             comPort = chosenPort;
 
-            comPort.setComPortParameters(57600, 7, ONE_STOP_BIT, EVEN_PARITY);
             comPort.openPort();
+            comPort.setComPortParameters(57600, 8, ONE_STOP_BIT, NO_PARITY);
+
+            comPort.addDataListener(new SerialPortDataListener() {
+                @Override
+                public int getListeningEvents() {
+                    return LISTENING_EVENT_DATA_RECEIVED; }
+
+                @Override
+                public void serialEvent(SerialPortEvent event) {
+                    byte[] getData = event.getReceivedData();
+
+                    StringBuilder message = new StringBuilder();
+
+                    for (byte data : getData) {
+                        String hex = String.format("%02x", data);
+
+                        message.append(hex);
+                        vector.add(hex);
+                    }
+
+                    String oldMessage = receiveField.getText();
+                    String newMessage = oldMessage + message + "\n";
+
+                    receiveField.setText(newMessage);
+                }
+            });
 
             setButtonsDisable(false);
         }
@@ -96,7 +95,12 @@ public class Controller {
     @FXML
     public void disconnect() {
 
+        comPort.removeDataListener();
         comPort.closePort();
+
+        sendField.clear();
+        receiveField.clear();
+
         setButtonsDisable(true);
     }
 
