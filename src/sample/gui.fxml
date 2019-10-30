@@ -15,33 +15,38 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <TextField fx:id="sendField" layoutX="48.0" layoutY="77.0" prefHeight="34.0" prefWidth="368.0" promptText="Type data to send">
+                  <TextField fx:id="sendField" layoutX="48.0" layoutY="77.0" prefHeight="34.0" prefWidth="368.0" promptText="Type data to send.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextField>
-                  <TextArea fx:id="receiveField" layoutX="46.0" layoutY="130.0" prefHeight="205.0" prefWidth="503.0" promptText="This is received data">
+                  <TextArea fx:id="receiveField" layoutX="46.0" layoutY="130.0" prefHeight="205.0" prefWidth="503.0" promptText="This is received data.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="427.0" layoutY="77.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="53.0" text="SEND">
+                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="424.0" layoutY="77.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="58.0" text="SEND">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="resetButton" layoutX="490.0" layoutY="77.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="58.0" text="RESET">
+                  <Button fx:id="resetButton" layoutX="490.0" layoutY="27.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="58.0" text="RESET">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <ComboBox fx:id="ports" layoutX="48.0" layoutY="26.0" prefHeight="34.0" prefWidth="296.0" promptText="Available ports" />
-                  <Button fx:id="connectButton" layoutX="358.0" layoutY="26.0" mnemonicParsing="false" onAction="#connect" prefHeight="34.0" prefWidth="78.0" text="CONNECT">
+                  <ComboBox fx:id="ports" layoutX="48.0" layoutY="26.0" prefHeight="34.0" prefWidth="300.0" promptText="Available ports" />
+                  <Button fx:id="connectButton" layoutX="357.0" layoutY="27.0" mnemonicParsing="false" onAction="#connect" prefHeight="34.0" prefWidth="58.0" text="OPEN">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="disconnectButton" layoutX="450.0" layoutY="26.0" mnemonicParsing="false" onAction="#disconnect" prefHeight="34.0" prefWidth="97.0" text="DISCONNECT">
+                  <Button fx:id="disconnectButton" layoutX="423.0" layoutY="27.0" mnemonicParsing="false" onAction="#disconnect" prefHeight="34.0" prefWidth="58.0" text="CLOSE">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </Button>
+                  <Button fx:id="clearButton" layoutX="490.0" layoutY="77.0" mnemonicParsing="false" onAction="#clear" prefHeight="34.0" prefWidth="58.0" text="CLEAR">
                      <font>
                         <Font size="13.0" />
                      </font>

@@ -12,6 +12,8 @@ import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextArea;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.Vector;
 
 import static com.fazecast.jSerialComm.SerialPort.*;
@@ -26,6 +28,9 @@ public class Controller {
 
     @FXML
     private Button disconnectButton;
+
+    @FXML
+    private Button clearButton;
 
     @FXML
     private TextField sendField;
@@ -62,15 +67,26 @@ public class Controller {
 
             comPort.openPort();
             comPort.setComPortParameters(57600, 8, ONE_STOP_BIT, NO_PARITY);
+            comPort.setComPortTimeouts(
+                    SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
+            int off = 0;
 
             comPort.addDataListener(new SerialPortDataListener() {
                 @Override
                 public int getListeningEvents() {
-                    return LISTENING_EVENT_DATA_RECEIVED; }
+                    return LISTENING_EVENT_DATA_AVAILABLE; }
 
                 @Override
                 public void serialEvent(SerialPortEvent event) {
-                    byte[] getData = event.getReceivedData();
+                    byte[] getData = new byte[]{};
+
+                    InputStream in = comPort.getInputStream();
+
+                    try {
+                        in.read(getData, 0, 1);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
 
                     StringBuilder message = new StringBuilder();
 
@@ -82,12 +98,13 @@ public class Controller {
                     }
 
                     String oldMessage = receiveField.getText();
-                    String newMessage = oldMessage + message + "\n";
+                    String newMessage = oldMessage + message;
 
                     receiveField.setText(newMessage);
                 }
             });
 
+            off++;
             setButtonsDisable(false);
         }
     }
@@ -98,10 +115,16 @@ public class Controller {
         comPort.removeDataListener();
         comPort.closePort();
 
-        sendField.clear();
-        receiveField.clear();
+        clear();
 
         setButtonsDisable(true);
+    }
+
+    @FXML
+    private void clear(){
+
+        sendField.clear();
+        receiveField.clear();
     }
 
     @FXML
@@ -118,10 +141,10 @@ public class Controller {
     @FXML
     public void reset(){
 
-        String resetCode = "30323030334333433030"; //02003C3C00 w 0x
+        byte[] resetBytes = new byte[]{0x02, 0x00, 0x3C, 0x3C, 0x00};
 
         beforeWrite();
-        comPort.writeBytes(resetCode.getBytes(), resetCode.getBytes().length);
+        comPort.writeBytes(resetBytes, resetBytes.length);
         afterWrite();
     }
 
@@ -130,6 +153,7 @@ public class Controller {
         ports.setDisable(!bool);
         connectButton.setDisable(!bool);
         disconnectButton.setDisable(bool);
+        clearButton.setDisable(bool);
         sendButton.setDisable(bool);
         resetButton.setDisable(bool);
     }
