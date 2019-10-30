@@ -45,7 +45,6 @@ public class Controller {
     private TextArea receiveField;
 
     private Vector<String> vector = new Vector<>();
-    private int current = 0;
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
 
@@ -68,8 +67,7 @@ public class Controller {
             comPort.openPort();
             comPort.setComPortParameters(57600, 8, ONE_STOP_BIT, NO_PARITY);
             comPort.setComPortTimeouts(
-                    SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
-            int off = 0;
+                    SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 10000, 0);
 
             comPort.addDataListener(new SerialPortDataListener() {
                 @Override
@@ -78,33 +76,28 @@ public class Controller {
 
                 @Override
                 public void serialEvent(SerialPortEvent event) {
-                    byte[] getData = new byte[]{};
 
+                    byte[] data = new byte[1];
                     InputStream in = comPort.getInputStream();
 
                     try {
-                        in.read(getData, 0, 1);
+                        in.read(data, 0, 1);
+
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
 
-                    StringBuilder message = new StringBuilder();
+                    String hex = String.format("%02x", data[0]);
 
-                    for (byte data : getData) {
-                        String hex = String.format("%02x", data);
-
-                        message.append(hex);
-                        vector.add(hex);
-                    }
+                    //vector.add(hex);
 
                     String oldMessage = receiveField.getText();
-                    String newMessage = oldMessage + message;
+                    String newMessage = oldMessage + hex + " "; //X ";
 
                     receiveField.setText(newMessage);
                 }
             });
 
-            off++;
             setButtonsDisable(false);
         }
     }
