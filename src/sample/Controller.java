@@ -44,7 +44,17 @@ public class Controller {
     @FXML
     private TextArea receiveField;
 
-    private Vector<String> vector = new Vector<>();
+    public enum STATUS {
+        LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC,
+        DATA_COLLECT, LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE;
+    }
+
+    private STATUS status = STATUS.LOOK_4_BEGIN;
+    private int len = 0;
+    private String cc = null;
+    private Vector<String> data = new Vector<>();
+    private String FCS_1 = null;
+    private String FCS_2 = null;
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
 
@@ -67,7 +77,7 @@ public class Controller {
             comPort.openPort();
             comPort.setComPortParameters(57600, 8, ONE_STOP_BIT, NO_PARITY);
             comPort.setComPortTimeouts(
-                    SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 10000, 0);
+                    SerialPort.TIMEOUT_READ_BLOCKING | SerialPort.TIMEOUT_WRITE_BLOCKING, 0, 0);
 
             comPort.addDataListener(new SerialPortDataListener() {
                 @Override
@@ -77,24 +87,75 @@ public class Controller {
                 @Override
                 public void serialEvent(SerialPortEvent event) {
 
-                    byte[] data = new byte[1];
+                    byte[] getByte = new byte[1];
                     InputStream in = comPort.getInputStream();
 
-                    try {
-                        in.read(data, 0, 1);
+                    while(comPort.bytesAvailable() > 0) {
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
+                        try {
+                            in.read(getByte, 0, 1);
+
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+
+                        String hex = String.format("%02x", getByte[0]);
+
+                        switch (status){
+
+                            case LOOK_4_BEGIN:
+
+                                if(hex.equals("02") || hex.equals("03")){
+                                    status = STATUS.LOOK_4_LEN;
+                                }
+
+                                break;
+
+                            case LOOK_4_LEN:
+
+                                len = Integer.valueOf(hex);
+                                status = STATUS.LOOK_4_CC;
+
+                                break;
+
+                            case LOOK_4_CC:
+
+                                cc = hex;
+                                status = STATUS.DATA_COLLECT;
+
+                                break;
+
+                            case DATA_COLLECT:
+
+                                if(len == 0){
+                                    status = STATUS.LOOK_4_FCS_1_BYTE;
+                                }
+
+                                else {
+                                    data.add(hex);
+                                    len--;
+                                }
+
+                            case LOOK_4_FCS_1_BYTE:
+
+                                FCS_1 = hex;
+                                status = STATUS.LOOK_4_FCS_2_BYTE;
+
+                                break;
+
+                            case LOOK_4_FCS_2_BYTE:
+
+                                FCS_2 = hex;
+                                status = STATUS.LOOK_4_BEGIN;
+
+                                break;
+                        }
+
+                        String oldMessage = receiveField.getText();
+                        String newMessage = oldMessage + hex + " ";
+
+                        receiveField.setText(newMessage);
                     }
-
-                    String hex = String.format("%02x", data[0]);
-
-                    //vector.add(hex);
-
-                    String oldMessage = receiveField.getText();
-                    String newMessage = oldMessage + hex + " "; //X ";
-
-                    receiveField.setText(newMessage);
                 }
             });
 
