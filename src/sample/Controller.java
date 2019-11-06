@@ -112,16 +112,20 @@ public class Controller {
                                     begin = hex;
                                     state = STATE.LOOK_4_STATUS;
                                 }
+                                data.clear();
+
                                 break;
 
                             case LOOK_4_LEN:
                                 len = hex;
                                 state = STATE.LOOK_4_CC;
+
                                 break;
 
                             case LOOK_4_CC:
                                 cc = hex;
                                 state = STATE.DATA_COLLECT;
+
                                 break;
 
                             case DATA_COLLECT:
@@ -131,18 +135,23 @@ public class Controller {
                                 else {
                                     data.add(hex);
                                     len--;
+
+                                    break;
                                 }
 
                             case LOOK_4_FCS_1_BYTE:
                                 FCS_1 = hex;
                                 state = STATE.LOOK_4_FCS_2_BYTE;
+
                                 break;
 
                             case LOOK_4_FCS_2_BYTE:
                                 FCS_2 = hex;
                                 state = STATE.LOOK_4_BEGIN;
 
-                                Frame localFrame = new Frame(begin, len, cc, data, FCS_1, FCS_2);
+                                Frame localFrame = new Frame(begin, data.size(), cc, data, FCS_1, FCS_2);
+                                displayFrame(localFrame.toString());
+
                                 int checkFrame = localFrame.makeFrame();
 
                                 if(checkFrame == 1){
@@ -151,6 +160,7 @@ public class Controller {
                                 else if(checkFrame == -1){
                                     comPort.writeBytes(NACK, 1);
                                 }
+
                                 break;
 
                             case LOOK_4_STATUS:
@@ -158,21 +168,31 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame statusFrame = new Frame(begin, status);
+                                displayFrame(statusFrame.toString());
+
                                 break;
                         }
 
-                        String hexToString = String.format("%02x", hex);
+                        /*String hexToString = String.format("%02x", hex);
 
                         String oldMessage = receiveField.getText();
                         String newMessage = oldMessage + hexToString + " ";
 
-                        receiveField.setText(newMessage);
+                        receiveField.setText(newMessage);*/
                     }
                 }
             });
 
             setButtonsDisable(false);
         }
+    }
+
+    private void displayFrame(String frame){
+
+        String oldMessage = receiveField.getText();
+        String newMessage = oldMessage + frame + "\n";
+
+        receiveField.setText(newMessage);
     }
 
     @FXML
