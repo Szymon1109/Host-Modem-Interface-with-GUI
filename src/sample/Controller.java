@@ -143,11 +143,12 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame localFrame = new Frame(begin, len, cc, data, FCS_1, FCS_2);
+                                int checkFrame = localFrame.makeFrame();
 
-                                if(localFrame.makeFrame() == 1){
+                                if(checkFrame == 1){
                                     comPort.writeBytes(ACK, 1);
                                 }
-                                else if(localFrame.makeFrame() == -1){
+                                else if(checkFrame == -1){
                                     comPort.writeBytes(NACK, 1);
                                 }
                                 break;
@@ -160,8 +161,10 @@ public class Controller {
                                 break;
                         }
 
+                        String hexToString = String.format("%02x", hex);
+
                         String oldMessage = receiveField.getText();
-                        String newMessage = oldMessage + hex + " ";
+                        String newMessage = oldMessage + hexToString + " ";
 
                         receiveField.setText(newMessage);
                     }
