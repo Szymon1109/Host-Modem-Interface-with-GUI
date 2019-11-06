@@ -44,17 +44,17 @@ public class Controller {
     @FXML
     private TextArea receiveField;
 
-    public enum STATUS {
+    public enum STATE {
         LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC,
         DATA_COLLECT, LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE;
     }
 
-    private STATUS status = STATUS.LOOK_4_BEGIN;
-    private int len = 0;
-    private String cc = null;
-    private Vector<String> data = new Vector<>();
-    private String FCS_1 = null;
-    private String FCS_2 = null;
+    private static STATE state = STATE.LOOK_4_BEGIN;
+    private static int begin, len, cc, FCS_1, FCS_2;
+    private static Vector<Integer> data = new Vector<>();
+
+    private static final byte[] ACK = new byte[]{0x06};
+    private static final byte[] NACK = new byte[]{0x15};
 
     private SerialPort comPort = SerialPort.getCommPorts()[0];
 
@@ -99,54 +99,53 @@ public class Controller {
                             e.printStackTrace();
                         }
 
-                        String hex = String.format("%02x", getByte[0]);
+                        int hex = getByte[0];
 
-                        switch (status){
+                        switch (state){
 
                             case LOOK_4_BEGIN:
-
-                                if(hex.equals("02") || hex.equals("03")){
-                                    status = STATUS.LOOK_4_LEN;
+                                if(hex == 0x02 || hex == 0x03){
+                                    begin = hex;
+                                    state = STATE.LOOK_4_LEN;
                                 }
-
                                 break;
 
                             case LOOK_4_LEN:
-
-                                len = Integer.valueOf(hex);
-                                status = STATUS.LOOK_4_CC;
-
+                                len = hex;
+                                state = STATE.LOOK_4_CC;
                                 break;
 
                             case LOOK_4_CC:
-
                                 cc = hex;
-                                status = STATUS.DATA_COLLECT;
-
+                                state = STATE.DATA_COLLECT;
                                 break;
 
                             case DATA_COLLECT:
-
                                 if(len == 0){
-                                    status = STATUS.LOOK_4_FCS_1_BYTE;
+                                    state = STATE.LOOK_4_FCS_1_BYTE;
                                 }
-
                                 else {
                                     data.add(hex);
                                     len--;
                                 }
 
                             case LOOK_4_FCS_1_BYTE:
-
                                 FCS_1 = hex;
-                                status = STATUS.LOOK_4_FCS_2_BYTE;
-
+                                state = STATE.LOOK_4_FCS_2_BYTE;
                                 break;
 
                             case LOOK_4_FCS_2_BYTE:
-
                                 FCS_2 = hex;
-                                status = STATUS.LOOK_4_BEGIN;
+                                state = STATE.LOOK_4_BEGIN;
+
+                                Frame frame = new Frame(begin, len, cc, data, FCS_1, FCS_2);
+
+                                if(frame.makeFrame()){
+                                    comPort.writeBytes(ACK, 1);
+                                }
+                                else{
+                                    comPort.writeBytes(NACK, 1);
+                                }
 
                                 break;
                         }
