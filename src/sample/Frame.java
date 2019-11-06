@@ -10,8 +10,10 @@ public class Frame {
     private Vector<Integer> data;
     private int FCS_1;
     private int FCS_2;
+    private int status;
 
     public Frame(int begin, int len, int cc, Vector<Integer> data, int FCS_1, int FCS_2){
+
         this.begin = begin;
         this.len = len;
         this.cc = cc;
@@ -20,20 +22,30 @@ public class Frame {
         this.FCS_2 = FCS_2;
     }
 
-    public boolean makeFrame(){
+    public Frame(int begin, int status){
 
-        int sumCorrect = FCS_1 + FCS_2;
-        int sumCalc = len + cc;
+        this.begin = begin;
+        this.status = status;
+    }
 
-        for (Integer getData: data) {
-            sumCalc += getData;
-        }
+    public int makeFrame(){
 
-        if(sumCorrect == sumCalc){
-            return true;
+        if(begin == 0x02) {
+            int sumCorrect = FCS_1 + FCS_2;
+            int sumCalc = len + cc;
+
+            for (Integer getData : data) {
+                sumCalc += getData;
+            }
+
+            if (sumCorrect == sumCalc) {
+                return 1;
+            } else {
+                return -1;
+            }
         }
         else{
-            return false;
+            return 0;
         }
     }
 }

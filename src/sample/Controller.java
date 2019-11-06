@@ -45,12 +45,12 @@ public class Controller {
     private TextArea receiveField;
 
     public enum STATE {
-        LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC,
-        DATA_COLLECT, LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE;
+        LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC, DATA_COLLECT,
+        LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE, LOOK_4_STATUS;
     }
 
     private static STATE state = STATE.LOOK_4_BEGIN;
-    private static int begin, len, cc, FCS_1, FCS_2;
+    private static int begin, len, cc, FCS_1, FCS_2, status;
     private static Vector<Integer> data = new Vector<>();
 
     private static final byte[] ACK = new byte[]{0x06};
@@ -108,6 +108,10 @@ public class Controller {
                                     begin = hex;
                                     state = STATE.LOOK_4_LEN;
                                 }
+                                else if(hex == 0x3f) {
+                                    begin = hex;
+                                    state = STATE.LOOK_4_STATUS;
+                                }
                                 break;
 
                             case LOOK_4_LEN:
@@ -138,15 +142,21 @@ public class Controller {
                                 FCS_2 = hex;
                                 state = STATE.LOOK_4_BEGIN;
 
-                                Frame frame = new Frame(begin, len, cc, data, FCS_1, FCS_2);
+                                Frame localFrame = new Frame(begin, len, cc, data, FCS_1, FCS_2);
 
-                                if(frame.makeFrame()){
+                                if(localFrame.makeFrame() == 1){
                                     comPort.writeBytes(ACK, 1);
                                 }
-                                else{
+                                else if(localFrame.makeFrame() == -1){
                                     comPort.writeBytes(NACK, 1);
                                 }
+                                break;
 
+                            case LOOK_4_STATUS:
+                                status = hex;
+                                state = STATE.LOOK_4_BEGIN;
+
+                                Frame statusFrame = new Frame(begin, status);
                                 break;
                         }
 
