@@ -150,7 +150,7 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame localFrame = new Frame(begin, data.size(), cc, data, FCS_1, FCS_2);
-                                displayFrame(localFrame.toString());
+                                //displayFrame(localFrame.toString());
 
                                 int checkFrame = localFrame.makeFrame();
 
@@ -168,17 +168,18 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame statusFrame = new Frame(begin, status);
-                                displayFrame(statusFrame.toString());
+                                //displayFrame(statusFrame.toString());
 
                                 break;
                         }
 
-                        /*String hexToString = String.format("%02x", hex);
+                        //delete lines below and open frame display
+                        String hexToString = String.format("%02x", hex);
 
                         String oldMessage = receiveField.getText();
                         String newMessage = oldMessage + hexToString + " ";
 
-                        receiveField.setText(newMessage);*/
+                        receiveField.setText(newMessage);
                     }
                 }
             });

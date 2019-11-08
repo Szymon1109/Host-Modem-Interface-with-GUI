@@ -28,7 +28,7 @@ public class Frame {
         this.status = status;
     }
 
-    public int makeFrame(){
+     public int makeFrame(){
 
         if(begin == 0x02) {
             int sumCorrect = FCS_1 + FCS_2;
@@ -52,23 +52,32 @@ public class Frame {
     @Override
     public String toString(){
 
-        String frame = null;
+        String frame = "[ ]";
 
         if(begin == 0x02 || begin == 0x03){
 
-            frame = "[" + String.format("%02x", begin) + " " + String.format("%02x", len) + " " + String.format("%02x", cc) + " ";
+            String begin = String.format("%02x", this.begin);
+            String len = String.format("%02x", this.len);
+            String cc = String.format("%02x", this.cc);
+            String data = "";
+            String FCS_1 = String.format("%02x", this.FCS_1);
+            String FCS_2 = String.format("%02x", this.FCS_2);
 
-            if(data != null) {
-                for (Integer getData : data) {
-                    frame += String.format("%02x", getData) + " ";
+            if(this.data != null) {
+                for (Integer getData : this.data) {
+                    data += String.format("%02x", getData) + " ";
                 }
             }
 
-            frame += String.format("%02x", FCS_1) + " " + String.format("%02x", FCS_2) + "]";
+            frame = "[" + begin + " " + len + " " + cc + " " + data + FCS_1 + " " + FCS_2 + "]";
         }
 
         else if(begin == 0x3f){
-            frame = "[" + String.format("%02x", begin) + " " + String.format("%02x", status) + "]";
+
+            String begin = String.format("%02x", this.begin);
+            String status = String.format("%02x", this.status);
+
+            frame = "[" + begin + " " + status + "]";
         }
 
         return frame;
