@@ -28,7 +28,7 @@ public class Frame {
         this.status = status;
     }
 
-     public int makeFrame(){
+     public int checkFrame(){
 
         if(begin == 0x02) {
             int sumCorrect = FCS_1 + FCS_2;

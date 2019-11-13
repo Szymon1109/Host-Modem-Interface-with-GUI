@@ -46,7 +46,7 @@ public class Controller {
 
     public enum STATE {
         LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC, DATA_COLLECT,
-        LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE, LOOK_4_STATUS;
+        LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE, LOOK_4_STATUS
     }
 
     private static STATE state = STATE.LOOK_4_BEGIN;
@@ -150,9 +150,9 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame localFrame = new Frame(begin, data.size(), cc, data, FCS_1, FCS_2);
-                                //displayFrame(localFrame.toString());
+                                displayFrame(localFrame.toString());
 
-                                int checkFrame = localFrame.makeFrame();
+                                int checkFrame = localFrame.checkFrame();
 
                                 if(checkFrame == 1){
                                     comPort.writeBytes(ACK, 1);
@@ -168,18 +168,13 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame statusFrame = new Frame(begin, status);
-                                //displayFrame(statusFrame.toString());
+                                displayFrame(statusFrame.toString());
 
                                 break;
                         }
 
-                        //delete lines below and open frame display
-                        String hexToString = String.format("%02x", hex);
-
-                        String oldMessage = receiveField.getText();
-                        String newMessage = oldMessage + hexToString + " ";
-
-                        receiveField.setText(newMessage);
+                        /*String hexToString = String.format("%02x", hex) + " ";
+                        javafx.application.Platform.runLater(() -> receiveField.appendText(hexToString));*/
                     }
                 }
             });
@@ -190,10 +185,8 @@ public class Controller {
 
     private void displayFrame(String frame){
 
-        String oldMessage = receiveField.getText();
-        String newMessage = oldMessage + frame + "\n";
-
-        receiveField.setText(newMessage);
+        String message = frame + "\n";
+        javafx.application.Platform.runLater(() -> receiveField.appendText(message));
     }
 
     @FXML
