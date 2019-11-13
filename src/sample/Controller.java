@@ -108,9 +108,15 @@ public class Controller {
                                     begin = hex;
                                     state = STATE.LOOK_4_LEN;
                                 }
-                                else if(hex == 0x3f) {
+                                else if(hex == 0x3f){
                                     begin = hex;
                                     state = STATE.LOOK_4_STATUS;
+                                }
+                                else if(hex == 0x06){
+                                    displayFrame("[06]");
+                                }
+                                else if(hex == 0x15){
+                                    displayFrame("[15]");
                                 }
                                 data.clear();
 
