@@ -227,7 +227,8 @@ public class Controller {
     @FXML
     public void reset(){
 
-        byte[] resetBytes = new byte[]{0x02, 0x00, 0x3C, 0x3C, 0x00};
+        Frame resetFrame = new Frame(0x00, 0x3c, new Vector<>());
+        byte[] resetBytes = resetFrame.getBytes();
 
         beforeWrite();
         comPort.writeBytes(resetBytes, resetBytes.length);

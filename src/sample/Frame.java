@@ -12,7 +12,7 @@ public class Frame {
     private int FCS_2;
     private int status;
 
-    public Frame(int begin, int len, int cc, Vector<Integer> data, int FCS_1, int FCS_2){
+    public Frame(int begin, int len, int cc, Vector<Integer> data, int FCS_1, int FCS_2) {
 
         this.begin = begin;
         this.len = len;
@@ -22,15 +22,68 @@ public class Frame {
         this.FCS_2 = FCS_2;
     }
 
-    public Frame(int begin, int status){
+    public Frame(int begin, int status) {
 
         this.begin = begin;
         this.status = status;
     }
 
-     public int checkFrame(){
+    public Frame(int len, int cc, Vector<Integer> data) {
 
-        if(begin == 0x02) {
+        this.begin = 0x02;
+        this.len = len;
+        this.cc = cc;
+        this.data = data;
+
+        int fcs = len + cc;
+
+        for (int getByte : data) {
+            fcs += getByte;
+        }
+
+        if(fcs > 0xff){
+            this.FCS_1 = 0xff;
+            this.FCS_2 = fcs - 0xff;
+        }
+        else{
+            this.FCS_1 = fcs;
+            this.FCS_2 = 0x00;
+        }
+    }
+
+    public byte[] getBytes(){
+
+        Vector<Integer> frame = new Vector<>();
+
+        if(begin == 0x02 || begin == 0x03){
+
+            frame.add(begin);
+            frame.add(len);
+            frame.add(cc);
+            frame.addAll(data);
+            frame.add(FCS_1);
+            frame.add(FCS_2);
+        }
+        else if(begin == 0x3f){
+
+            frame.add(begin);
+            frame.add(status);
+        }
+
+        byte[] frameBytes = new byte[frame.size()];
+
+        for(int i = 0; i < frame.size(); i++){
+
+            int getByte = frame.get(i);
+            frameBytes[i] = (byte) getByte;
+        }
+
+        return frameBytes;
+    }
+
+    public int checkFrame() {
+
+        if (begin == 0x02) {
             int sumCorrect = FCS_1 + FCS_2;
             int sumCalc = len + cc;
 
@@ -40,21 +93,21 @@ public class Frame {
 
             if (sumCorrect == sumCalc) {
                 return 1;
+
             } else {
                 return -1;
             }
-        }
-        else{
+        } else {
             return 0;
         }
     }
 
     @Override
-    public String toString(){
+    public String toString() {
 
         String frame = "[ ]";
 
-        if(begin == 0x02 || begin == 0x03){
+        if (begin == 0x02 || begin == 0x03) {
 
             String begin = String.format("%02x", this.begin);
             String len = String.format("%02x", this.len);
@@ -63,16 +116,15 @@ public class Frame {
             String FCS_1 = String.format("%02x", this.FCS_1);
             String FCS_2 = String.format("%02x", this.FCS_2);
 
-            if(this.data != null) {
+            if (! this.data.isEmpty()) {
                 for (Integer getData : this.data) {
                     data += String.format("%02x", getData) + " ";
                 }
             }
 
             frame = "[" + begin + " " + len + " " + cc + " " + data + FCS_1 + " " + FCS_2 + "]";
-        }
 
-        else if(begin == 0x3f){
+        } else if (begin == 0x3f) {
 
             String begin = String.format("%02x", this.begin);
             String status = String.format("%02x", this.status);
