@@ -7,10 +7,7 @@ import com.fazecast.jSerialComm.SerialPortEvent;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Button;
-import javafx.scene.control.ComboBox;
-import javafx.scene.control.TextField;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -28,6 +25,12 @@ public class Controller {
 
     @FXML
     private Button disconnectButton;
+
+    @FXML
+    private ToggleButton phyButton;
+
+    @FXML
+    private ToggleButton dlButton;
 
     @FXML
     private Button clearButton;
@@ -213,6 +216,68 @@ public class Controller {
         receiveField.clear();
     }
 
+    private void setButtonsDisable(boolean bool){
+
+        ports.setDisable(!bool);
+
+        connectButton.setDisable(!bool);
+        disconnectButton.setDisable(bool);
+        clearButton.setDisable(bool);
+        sendButton.setDisable(bool);
+        resetButton.setDisable(bool);
+
+        phyButton.setDisable(bool);
+        phyButton.setSelected(!bool);
+        dlButton.setDisable(bool);
+        dlButton.setSelected(false);
+    }
+
+    @FXML
+    public void setPhy(){
+
+        if(phyButton.isSelected()) {
+
+            dlButton.setSelected(false);
+
+            Vector<Integer> phyData = new Vector<>();
+            phyData.add(0x00);
+            phyData.add(0x10);
+
+            Frame phyFrame = new Frame(0x02, 0x08, phyData);
+            byte[] phyBytes = phyFrame.getBytes();
+
+            beforeWrite();
+            comPort.writeBytes(phyBytes, phyBytes.length);
+            afterWrite();
+        }
+        else {
+            phyButton.setSelected(true);
+        }
+    }
+
+    @FXML
+    public void setDl(){
+
+        if(dlButton.isSelected()) {
+
+            phyButton.setSelected(false);
+
+            Vector<Integer> dlData = new Vector<>();
+            dlData.add(0x00);
+            dlData.add(0x11);
+
+            Frame dlFrame = new Frame(0x02, 0x08, dlData);
+            byte[] dlBytes = dlFrame.getBytes();
+
+            beforeWrite();
+            comPort.writeBytes(dlBytes, dlBytes.length);
+            afterWrite();
+        }
+        else{
+            dlButton.setSelected(true);
+        }
+    }
+
     @FXML
     public void send(){
 
@@ -233,16 +298,9 @@ public class Controller {
         beforeWrite();
         comPort.writeBytes(resetBytes, resetBytes.length);
         afterWrite();
-    }
 
-    private void setButtonsDisable(boolean bool){
-
-        ports.setDisable(!bool);
-        connectButton.setDisable(!bool);
-        disconnectButton.setDisable(bool);
-        clearButton.setDisable(bool);
-        sendButton.setDisable(bool);
-        resetButton.setDisable(bool);
+        phyButton.setSelected(true);
+        dlButton.setSelected(false);
     }
 
     private void beforeWrite(){
