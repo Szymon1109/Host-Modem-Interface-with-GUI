@@ -6,6 +6,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -13,44 +14,54 @@
   <tabs>
     <Tab text="Transmission">
       <content>
-        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="618.0">
                <children>
-                  <TextField fx:id="sendField" layoutX="48.0" layoutY="77.0" prefHeight="34.0" prefWidth="368.0" promptText="Type data to send.">
+                  <TextField fx:id="sendField" layoutX="34.0" layoutY="77.0" prefHeight="34.0" prefWidth="329.0" promptText="Type data to send.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextField>
-                  <TextArea fx:id="receiveField" layoutX="46.0" layoutY="130.0" prefHeight="205.0" prefWidth="503.0" promptText="This is received data.">
+                  <TextArea fx:id="receiveField" layoutX="34.0" layoutY="130.0" prefHeight="207.0" prefWidth="531.0" promptText="This is received data.">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="424.0" layoutY="77.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="58.0" text="SEND">
+                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="372.0" layoutY="77.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="58.0" text="SEND">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="resetButton" layoutX="490.0" layoutY="27.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="58.0" text="RESET">
+                  <Button fx:id="resetButton" layoutX="506.0" layoutY="77.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="58.0" text="RESET">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <ComboBox fx:id="ports" layoutX="48.0" layoutY="27.0" prefHeight="34.0" prefWidth="234.0" promptText="Available ports" />
-                  <Button fx:id="connectButton" layoutX="291.0" layoutY="27.0" mnemonicParsing="false" onAction="#connect" prefHeight="34.0" prefWidth="58.0" text="OPEN">
+                  <ComboBox fx:id="ports" layoutX="34.0" layoutY="27.0" prefHeight="34.0" prefWidth="262.0" promptText="Available ports" />
+                  <Button fx:id="connectButton" layoutX="305.0" layoutY="27.0" mnemonicParsing="false" onAction="#connect" prefHeight="34.0" prefWidth="58.0" text="OPEN">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="disconnectButton" layoutX="357.0" layoutY="27.0" mnemonicParsing="false" onAction="#disconnect" prefHeight="34.0" prefWidth="58.0" text="CLOSE">
+                  <Button fx:id="disconnectButton" layoutX="372.0" layoutY="27.0" mnemonicParsing="false" onAction="#disconnect" prefHeight="34.0" prefWidth="58.0" text="CLOSE">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="clearButton" layoutX="490.0" layoutY="77.0" mnemonicParsing="false" onAction="#clear" prefHeight="34.0" prefWidth="58.0" text="CLEAR">
+                  <Button fx:id="clearButton" layoutX="439.0" layoutY="77.0" mnemonicParsing="false" onAction="#clear" prefHeight="34.0" prefWidth="58.0" text="CLEAR">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
+                  <ToggleButton fx:id="dlButton" layoutX="522.0" layoutY="27.0" mnemonicParsing="false" onAction="#dlSet" prefHeight="34.0" prefWidth="42.0" text="DL">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </ToggleButton>
+                  <ToggleButton fx:id="phyButton" layoutX="475.0" layoutY="27.0" mnemonicParsing="false" onAction="#phySet" prefHeight="34.0" prefWidth="42.0" text="PHY" textAlignment="CENTER">
+                     <font>
+                        <Font size="13.0" />
+                     </font>
+                  </ToggleButton>
                </children></AnchorPane>
       </content>
     </Tab>
