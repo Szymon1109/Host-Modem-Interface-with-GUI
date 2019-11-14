@@ -52,12 +52,12 @@
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <ToggleButton fx:id="dlButton" layoutX="522.0" layoutY="27.0" mnemonicParsing="false" onAction="#dlSet" prefHeight="34.0" prefWidth="42.0" text="DL">
+                  <ToggleButton fx:id="dlButton" layoutX="522.0" layoutY="27.0" mnemonicParsing="false" onAction="#setDl" prefHeight="34.0" prefWidth="42.0" text="DL">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </ToggleButton>
-                  <ToggleButton fx:id="phyButton" layoutX="475.0" layoutY="27.0" mnemonicParsing="false" onAction="#phySet" prefHeight="34.0" prefWidth="42.0" text="PHY" textAlignment="CENTER">
+                  <ToggleButton fx:id="phyButton" layoutX="475.0" layoutY="27.0" mnemonicParsing="false" onAction="#setPhy" prefHeight="34.0" prefWidth="42.0" text="PHY" textAlignment="CENTER">
                      <font>
                         <Font size="13.0" />
                      </font>
