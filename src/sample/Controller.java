@@ -227,9 +227,9 @@ public class Controller {
         resetButton.setDisable(bool);
 
         phyButton.setDisable(bool);
-        phyButton.setSelected(!bool);
+        phyButton.setSelected(false);
         dlButton.setDisable(bool);
-        dlButton.setSelected(false);
+        dlButton.setSelected(!bool);
     }
 
     @FXML
@@ -299,8 +299,8 @@ public class Controller {
         comPort.writeBytes(resetBytes, resetBytes.length);
         afterWrite();
 
-        phyButton.setSelected(true);
-        dlButton.setSelected(false);
+        phyButton.setSelected(false);
+        dlButton.setSelected(true);
     }
 
     private void beforeWrite(){
