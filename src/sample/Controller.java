@@ -162,7 +162,7 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame localFrame = new Frame(begin, data.size(), cc, data, FCS_1, FCS_2);
-                                displayFrame(localFrame.toString());
+                                displayFrame(localFrame.toHexString(), localFrame.toAsciiString());
 
                                 int checkFrame = localFrame.checkFrame();
 
@@ -180,7 +180,7 @@ public class Controller {
                                 state = STATE.LOOK_4_BEGIN;
 
                                 Frame statusFrame = new Frame(begin, status);
-                                displayFrame(statusFrame.toString());
+                                displayFrame(statusFrame.toHexString(), statusFrame.toAsciiString());
 
                                 break;
                         }
@@ -195,10 +195,13 @@ public class Controller {
         }
     }
 
-    private void displayFrame(String frame){
+    private void displayFrame(String hexFrame, String asciiFrame){
 
-        String message = frame + "\n";
-        javafx.application.Platform.runLater(() -> hexField.appendText(message));
+        String hexMessage = hexFrame + "\n";
+        javafx.application.Platform.runLater(() -> hexField.appendText(hexMessage));
+
+        String asciiMessage = asciiFrame + "\n";
+        javafx.application.Platform.runLater(() -> asciiField.appendText(asciiMessage));
     }
 
     @FXML
@@ -217,6 +220,7 @@ public class Controller {
 
         sendField.clear();
         hexField.clear();
+        asciiField.clear();
     }
 
     private void setButtonsDisable(boolean bool){

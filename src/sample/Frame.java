@@ -102,8 +102,7 @@ public class Frame {
         }
     }
 
-    @Override
-    public String toString() {
+    public String toHexString() {
 
         String frame = "[ ]";
 
@@ -128,6 +127,38 @@ public class Frame {
 
             String begin = String.format("%02x", this.begin);
             String status = String.format("%02x", this.status);
+
+            frame = "[" + begin + " " + status + "]";
+        }
+
+        return frame;
+    }
+
+    public String toAsciiString() {
+
+        String frame = "[ ]";
+
+        if (begin == 0x02 || begin == 0x03) {
+
+            char begin = (char) this.begin;
+            char len = (char) this.len;
+            char cc = (char) this.cc;
+            String data = "";
+            char FCS_1 = (char) this.FCS_1;
+            char FCS_2 = (char) this.FCS_2;
+
+            if (! this.data.isEmpty()) {
+                for (Integer getData : this.data) {
+                    data += (char) getData.intValue() + " ";
+                }
+            }
+
+            frame = "[" + begin + " " + len + " " + cc + " " + data + FCS_1 + " " + FCS_2 + "]";
+
+        } else if (begin == 0x3f) {
+
+            char begin = (char) this.begin;
+            char status = (char) this.status;
 
             frame = "[" + begin + " " + status + "]";
         }
