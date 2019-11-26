@@ -119,10 +119,10 @@ public class Controller {
                                     state = STATE.LOOK_4_STATUS;
                                 }
                                 else if(hex == 0x06){
-                                    displayFrame("[06]");
+                                    displayFrame("[06]", "[" + (char) 0x06 + "]");
                                 }
                                 else if(hex == 0x15){
-                                    displayFrame("[15]");
+                                    displayFrame("[15]", "[" + (char) 0x15 + "]");
                                 }
                                 data.clear();
 
