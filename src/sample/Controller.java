@@ -45,7 +45,10 @@ public class Controller {
     private Button resetButton;
 
     @FXML
-    private TextArea receiveField;
+    private TextArea hexField;
+
+    @FXML
+    private TextArea asciiField;
 
     public enum STATE {
         LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC, DATA_COLLECT,
@@ -195,7 +198,7 @@ public class Controller {
     private void displayFrame(String frame){
 
         String message = frame + "\n";
-        javafx.application.Platform.runLater(() -> receiveField.appendText(message));
+        javafx.application.Platform.runLater(() -> hexField.appendText(message));
     }
 
     @FXML
@@ -213,7 +216,7 @@ public class Controller {
     private void clear(){
 
         sendField.clear();
-        receiveField.clear();
+        hexField.clear();
     }
 
     private void setButtonsDisable(boolean bool){

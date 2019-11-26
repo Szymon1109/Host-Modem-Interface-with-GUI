@@ -16,12 +16,17 @@
       <content>
         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="370.0" prefWidth="618.0">
                <children>
-                  <TextField fx:id="sendField" layoutX="34.0" layoutY="77.0" prefHeight="34.0" prefWidth="329.0" promptText="Type data to send.">
+                  <TextField fx:id="sendField" layoutX="34.0" layoutY="77.0" prefHeight="34.0" prefWidth="329.0" promptText="Data to send">
                      <font>
                         <Font size="14.0" />
                      </font>
                   </TextField>
-                  <TextArea fx:id="receiveField" layoutX="34.0" layoutY="130.0" prefHeight="207.0" prefWidth="531.0" promptText="This is received data.">
+                  <TextArea fx:id="hexField" layoutX="34.0" layoutY="130.0" prefHeight="207.0" prefWidth="260.0" promptText="Data in HEX format">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </TextArea>
+                  <TextArea fx:id="asciiField" layoutX="305.0" layoutY="130.0" prefHeight="207.0" prefWidth="260.0" promptText="Data in ASCII format">
                      <font>
                         <Font size="14.0" />
                      </font>
