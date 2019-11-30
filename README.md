@@ -4,3 +4,5 @@ Host-Modem ST7580 Interface using jSerialComm library
 ```
 Szymon Betlewski
 ```
+## Application window:
+<img src="images/appWindow.png">
