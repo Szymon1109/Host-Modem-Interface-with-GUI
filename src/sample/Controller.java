@@ -105,7 +105,7 @@ public class Controller {
                             e.printStackTrace();
                         }
 
-                        int hex = getByte[0];
+                        int hex = getByte[0] & 0xff;
 
                         switch (state){
 
