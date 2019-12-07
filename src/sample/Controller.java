@@ -27,22 +27,25 @@ public class Controller {
     private Button disconnectButton;
 
     @FXML
+    private Button resetButton;
+
+    @FXML
     private ToggleButton phyButton;
 
     @FXML
     private ToggleButton dlButton;
 
     @FXML
-    private Button clearButton;
+    private TextField sendField;
 
     @FXML
-    private TextField sendField;
+    private RadioButton dataType;
 
     @FXML
     private Button sendButton;
 
     @FXML
-    private Button resetButton;
+    private Button clearButton;
 
     @FXML
     private TextArea hexField;
@@ -237,6 +240,9 @@ public class Controller {
         phyButton.setSelected(false);
         dlButton.setDisable(bool);
         dlButton.setSelected(!bool);
+
+        dataType.setDisable(bool);
+        dataType.setSelected(false);
     }
 
     @FXML
@@ -286,12 +292,45 @@ public class Controller {
     }
 
     @FXML
+    public void changeDataType(){
+
+        if(dataType.isSelected()){
+
+            String hexText = sendField.getText();
+            String[] bytes = hexText.split("\\s");
+
+            StringBuilder chars = new StringBuilder();
+
+            for (String getByte : bytes) {
+                if (!getByte.equals("")) {
+                    chars.append((char) Integer.parseInt(getByte, 16));
+                }
+            }
+            sendField.setText(chars.toString());
+        }
+        else{
+            String asciiText = sendField.getText();
+            char[] chars = asciiText.toCharArray();
+
+            StringBuilder bytes = new StringBuilder();
+
+            for(char getChar : chars){
+                String hex = String.format("%02x", (int) getChar) + " ";
+                bytes.append(hex);
+            }
+            sendField.setText(bytes.toString());
+        }
+    }
+
+    @FXML
     public void send(){
 
         beforeWrite();
 
+        //TODO: checking if radio button is clicked
+        /* when radio button is clicked:
         String sendText = sendField.getText();
-        comPort.writeBytes(sendText.getBytes(), sendText.getBytes().length);
+        comPort.writeBytes(sendText.getBytes(), sendText.getBytes().length);*/
 
         afterWrite();
     }
