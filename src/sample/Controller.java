@@ -302,7 +302,7 @@ public class Controller {
             StringBuilder chars = new StringBuilder();
 
             for (String getByte : bytes) {
-                if (!getByte.equals("")) {
+                if (getByte.matches("^[a-fA-F0-9]{2}$")) {
                     chars.append((char) Integer.parseInt(getByte, 16));
                 }
             }
