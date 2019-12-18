@@ -82,17 +82,22 @@ public class Controller {
         LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE, LOOK_4_STATUS
     }
 
-    private static STATE state = STATE.LOOK_4_BEGIN;
-    private static int begin, len, cc, FCS_1, FCS_2, status;
-    private static Vector<Integer> data = new Vector<>();
-
     private enum MOD{
         B_PSK, Q_PSK, eight_PSK, B_FSK,
         B_PSK_coded, Q_PSK_coded, B_PSK_pna
     }
 
+    private enum TYPE{
+        PHY, DL
+    }
+
+    private static TYPE type = TYPE.DL;
     private static MOD mod = MOD.B_PSK;
     private static boolean fec = false;
+
+    private static STATE state = STATE.LOOK_4_BEGIN;
+    private static int begin, len, cc, FCS_1, FCS_2, status;
+    private static Vector<Integer> data = new Vector<>();
 
     private ToggleGroup toggleGroup = new ToggleGroup();
 
@@ -297,6 +302,7 @@ public class Controller {
 
         if(phyButton.isSelected()) {
 
+            type = TYPE.PHY;
             dlButton.setSelected(false);
 
             Vector<Integer> phyData = new Vector<>();
@@ -320,6 +326,7 @@ public class Controller {
 
         if(dlButton.isSelected()) {
 
+            type = TYPE.DL;
             phyButton.setSelected(false);
 
             Vector<Integer> dlData = new Vector<>();
@@ -344,16 +351,9 @@ public class Controller {
         if(dataType.isSelected()){
 
             String hexText = sendField.getText();
-            String[] bytes = hexText.split("\\s");
+            String asciiText = hexToAscii(hexText);
 
-            StringBuilder chars = new StringBuilder();
-
-            for (String getByte : bytes) {
-                if (getByte.matches("^[a-fA-F0-9]{2}$")) {
-                    chars.append((char) Integer.parseInt(getByte, 16));
-                }
-            }
-            sendField.setText(chars.toString());
+            sendField.setText(asciiText);
         }
         else{
             String asciiText = sendField.getText();
@@ -369,17 +369,111 @@ public class Controller {
         }
     }
 
+    private String hexToAscii(String hexText){
+
+        String[] bytes = hexText.split("\\s");
+        StringBuilder chars = new StringBuilder();
+
+        for (String getByte : bytes) {
+            if (getByte.matches("^[a-fA-F0-9]{2}$")) {
+                chars.append((char) Integer.parseInt(getByte, 16));
+            }
+        }
+
+        return chars.toString();
+    }
+
     @FXML
     public void send(){
 
+        int cc;
+
+        if(type == TYPE.PHY) {
+            cc = 0x24;
+        }
+        else {
+            cc = 0x50;
+        }
+
+        Vector<Integer> data = new Vector<>();
+
+        int firstByte = checkFirstByte();
+        data.add(firstByte);
+
+        if(!dataType.isSelected()){
+
+            String hexText = sendField.getText();
+            String asciiText = hexToAscii(hexText);
+            char[] chars = asciiText.toCharArray();
+
+            for(char getChar : chars){
+                data.add((int) getChar);
+            }
+        }
+
+        else {
+            String asciiText = sendField.getText();
+            char[] chars = asciiText.toCharArray();
+
+            for(char getChar : chars){
+                data.add((int) getChar);
+            }
+        }
+
+        int len = data.size();
+
+        Frame dataFrame = new Frame(len, cc, data);
+        byte[] dataBytes = dataFrame.getBytes();
+
         beforeWrite();
-
-        //TODO: checking if radio button is clicked
-        /* when radio button is clicked:
-        String sendText = sendField.getText();
-        comPort.writeBytes(sendText.getBytes(), sendText.getBytes().length);*/
-
+        comPort.writeBytes(dataBytes, dataBytes.length);
         afterWrite();
+    }
+
+    private int checkFirstByte(){
+        int firstByte;
+
+        if(fec){
+            firstByte = 1 << 3;
+        }
+        else{
+            firstByte = 0;
+        }
+
+        switch (mod){
+            case B_PSK:
+                firstByte |= 0b000;
+                break;
+
+            case Q_PSK:
+                firstByte |= 0b001;
+                break;
+
+            case eight_PSK:
+                firstByte |= 0b010;
+                break;
+
+            case B_FSK:
+                firstByte |= 0b011;
+                break;
+
+            case B_PSK_coded:
+                firstByte |= 0b100;
+                break;
+
+            case Q_PSK_coded:
+                firstByte |= 0b101;
+                break;
+
+            case B_PSK_pna:
+                firstByte |= 0b111;
+                break;
+        }
+
+        firstByte <<= 4;
+        firstByte |= 0b0100;
+
+        return firstByte;
     }
 
     @FXML
@@ -391,6 +485,8 @@ public class Controller {
         beforeWrite();
         comPort.writeBytes(resetBytes, resetBytes.length);
         afterWrite();
+
+        type = TYPE.DL;
 
         phyButton.setSelected(false);
         dlButton.setSelected(true);
