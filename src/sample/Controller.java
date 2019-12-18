@@ -53,7 +53,31 @@ public class Controller {
     @FXML
     private TextArea asciiField;
 
-    public enum STATE {
+    @FXML
+    private RadioButton BPSK;
+
+    @FXML
+    private RadioButton QPSK;
+
+    @FXML
+    private RadioButton eightPSK;
+
+    @FXML
+    private RadioButton BFSK;
+
+    @FXML
+    private RadioButton BPSKcoded;
+
+    @FXML
+    private RadioButton QPSKcoded;
+
+    @FXML
+    private RadioButton BPSKpna;
+
+    @FXML
+    private CheckBox FEC;
+
+    private enum STATE {
         LOOK_4_BEGIN, LOOK_4_LEN, LOOK_4_CC, DATA_COLLECT,
         LOOK_4_FCS_1_BYTE, LOOK_4_FCS_2_BYTE, LOOK_4_STATUS
     }
@@ -61,6 +85,16 @@ public class Controller {
     private static STATE state = STATE.LOOK_4_BEGIN;
     private static int begin, len, cc, FCS_1, FCS_2, status;
     private static Vector<Integer> data = new Vector<>();
+
+    private enum MOD{
+        B_PSK, Q_PSK, eight_PSK, B_FSK,
+        B_PSK_coded, Q_PSK_coded, B_PSK_pna
+    }
+
+    private static MOD mod = MOD.B_PSK;
+    private static boolean fec = false;
+
+    private ToggleGroup toggleGroup = new ToggleGroup();
 
     private static final byte[] ACK = new byte[]{0x06};
     private static final byte[] NACK = new byte[]{0x15};
@@ -70,10 +104,23 @@ public class Controller {
     public void initialize(){
 
         setButtonsDisable(true);
+        setToggleGroup();
 
         SerialPort[] allPorts = SerialPort.getCommPorts();
         ObservableList<SerialPort> allPortsObservList = FXCollections.observableArrayList(allPorts);
         ports.setItems(allPortsObservList);
+    }
+
+    private void setToggleGroup(){
+        BPSK.setSelected(true);
+
+        BPSK.setToggleGroup(toggleGroup);
+        QPSK.setToggleGroup(toggleGroup);
+        eightPSK.setToggleGroup(toggleGroup);
+        BFSK.setToggleGroup(toggleGroup);
+        BPSKcoded.setToggleGroup(toggleGroup);
+        QPSKcoded.setToggleGroup(toggleGroup);
+        BPSKpna.setToggleGroup(toggleGroup);
     }
 
     @FXML
@@ -242,7 +289,7 @@ public class Controller {
         dlButton.setSelected(!bool);
 
         dataType.setDisable(bool);
-        dataType.setSelected(false);
+        dataType.setSelected(!bool);
     }
 
     @FXML
@@ -366,5 +413,49 @@ public class Controller {
 
         comPort.clearRTS();
         comPort.clearDTR();
+    }
+
+    @FXML
+    public void changeMod(){
+
+        RadioButton radioButton = (RadioButton) toggleGroup.getSelectedToggle();
+        String selected = radioButton.getId();
+
+        switch (selected) {
+
+            case "BPSK":
+                mod = MOD.B_PSK;
+                break;
+
+            case "QPSK":
+                mod = MOD.Q_PSK;
+                break;
+
+            case "eightPSK":
+                mod = MOD.eight_PSK;
+                break;
+
+            case "BFSK":
+                mod = MOD.B_FSK;
+                break;
+
+            case "BPSKcoded":
+                mod = MOD.B_PSK_coded;
+                break;
+
+            case "QPSKcoded":
+                mod = MOD.Q_PSK_coded;
+                break;
+
+            case "BPSKpna":
+                mod = MOD.B_PSK_pna;
+                break;
+        }
+    }
+
+    @FXML
+    public void changeFEC(){
+
+        fec = FEC.isSelected();
     }
 }
