@@ -41,20 +41,14 @@ public class Frame {
             fcs += getByte;
         }
 
-        if(fcs > 0xff){
-            this.FCS_1 = 0xff;
-            this.FCS_2 = fcs - 0xff;
-        }
-        else{
-            this.FCS_1 = fcs;
-            this.FCS_2 = 0x00;
-        }
+        this.FCS_1 = fcs & 0xff;
+        this.FCS_2 = (fcs >> 8) & 0xff;
     }
 
     public int checkFrame() {
 
         if (begin == 0x02) {
-            int sumCorrect = FCS_1 + FCS_2;
+            int sumCorrect = (FCS_2 << 8) | FCS_1;
             int sumCalc = len + cc;
 
             for (Integer getData : data) {
