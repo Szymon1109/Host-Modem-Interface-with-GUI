@@ -9,7 +9,6 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
-<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
@@ -19,7 +18,7 @@
       <content>
         <AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="0.0" minWidth="0.0" prefHeight="400.0" prefWidth="650.0">
                <children>
-                  <TextField fx:id="sendField" layoutX="34.0" layoutY="77.0" prefHeight="34.0" prefWidth="370.0" promptText="Data to send">
+                  <TextField fx:id="sendField" layoutX="34.0" layoutY="77.0" prefHeight="34.0" prefWidth="441.0" promptText="Data to send">
                      <font>
                         <Font size="14.0" />
                      </font>
@@ -34,12 +33,12 @@
                         <Font size="14.0" />
                      </font>
                   </TextArea>
-                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="498.0" layoutY="76.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="56.0" text="SEND">
+                  <Button fx:id="sendButton" contentDisplay="BOTTOM" layoutX="562.0" layoutY="76.0" mnemonicParsing="false" onAction="#send" prefHeight="34.0" prefWidth="56.0" text="SEND">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="resetButton" layoutX="413.0" layoutY="27.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="56.0" text="RESET">
+                  <Button fx:id="resetButton" layoutX="498.0" layoutY="27.0" mnemonicParsing="false" onAction="#reset" prefHeight="34.0" prefWidth="56.0" text="RESET">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -55,22 +54,12 @@
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <Button fx:id="clearButton" layoutX="562.0" layoutY="76.0" mnemonicParsing="false" onAction="#clear" prefHeight="34.0" prefWidth="56.0" text="CLEAR">
+                  <Button fx:id="clearButton" layoutX="562.0" layoutY="27.0" mnemonicParsing="false" onAction="#clear" prefHeight="34.0" prefWidth="56.0" text="CLEAR">
                      <font>
                         <Font size="13.0" />
                      </font>
                   </Button>
-                  <ToggleButton fx:id="dlButton" layoutX="575.0" layoutY="27.0" mnemonicParsing="false" onAction="#setDl" prefHeight="34.0" prefWidth="42.0" text="DL">
-                     <font>
-                        <Font size="13.0" />
-                     </font>
-                  </ToggleButton>
-                  <ToggleButton fx:id="phyButton" layoutX="529.0" layoutY="27.0" mnemonicParsing="false" onAction="#setPhy" prefHeight="34.0" prefWidth="42.0" text="PHY" textAlignment="CENTER">
-                     <font>
-                        <Font size="13.0" />
-                     </font>
-                  </ToggleButton>
-                  <RadioButton fx:id="dataType" layoutX="413.0" layoutY="77.0" mnemonicParsing="false" onAction="#changeDataType" prefHeight="33.0" prefWidth="55.0" text="ASCII">
+                  <RadioButton fx:id="dataType" layoutX="485.0" layoutY="77.0" mnemonicParsing="false" onAction="#changeDataType" prefHeight="33.0" prefWidth="55.0" text="ASCII">
                      <font>
                         <Font size="13.0" />
                      </font>
@@ -82,51 +71,66 @@
         <content>
           <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                <children>
-                  <Label layoutX="115.0" layoutY="44.0" prefHeight="34.0" prefWidth="90.0" text="Modulation:">
+                  <Label layoutX="116.0" layoutY="43.0" prefHeight="34.0" prefWidth="104.0" text="MODULATION:">
                      <font>
-                        <Font name="System Italic" size="14.0" />
+                        <Font name="System Bold Italic" size="14.0" />
                      </font>
                   </Label>
                   <RadioButton fx:id="BPSK" layoutX="90.0" layoutY="92.0" mnemonicParsing="false" onAction="#changeMod" text="  B-PSK">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="QPSK" layoutX="90.0" layoutY="125.0" mnemonicParsing="false" onAction="#changeMod" text="  Q-PSK">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="eightPSK" layoutX="90.0" layoutY="158.0" mnemonicParsing="false" onAction="#changeMod" text="  8-PSK">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="BFSK" layoutX="90.0" layoutY="191.0" mnemonicParsing="false" onAction="#changeMod" text="  B-FSK">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="BPSKcoded" layoutX="90.0" layoutY="224.0" mnemonicParsing="false" onAction="#changeMod" text="  B-PSK coded">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="QPSKcoded" layoutX="90.0" layoutY="257.0" mnemonicParsing="false" onAction="#changeMod" text="  Q-PSK coded">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
                   <RadioButton fx:id="BPSKpna" layoutX="90.0" layoutY="290.0" mnemonicParsing="false" onAction="#changeMod" text="  B-PSK coded with PNA">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </RadioButton>
-                  <CheckBox fx:id="FEC" layoutX="418.0" layoutY="92.0" mnemonicParsing="false" onAction="#changeFEC" text="FEC">
+                  <CheckBox fx:id="FEC" layoutX="420.0" layoutY="290.0" mnemonicParsing="false" onAction="#changeFEC" text="FEC">
                      <font>
-                        <Font size="13.0" />
+                        <Font size="14.0" />
                      </font>
                   </CheckBox>
+                  <RadioButton fx:id="phyButton" layoutX="419.0" layoutY="125.0" mnemonicParsing="false" onAction="#changeLay" text="PHY">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </RadioButton>
+                  <RadioButton fx:id="dlButton" layoutX="419.0" layoutY="92.0" mnemonicParsing="false" onAction="#changeLay" text="DL">
+                     <font>
+                        <Font size="14.0" />
+                     </font>
+                  </RadioButton>
+                  <Label layoutX="443.0" layoutY="43.0" prefHeight="34.0" prefWidth="48.0" text="LAYER:">
+                     <font>
+                        <Font name="System Bold Italic" size="14.0" />
+                     </font>
+                  </Label>
                </children></AnchorPane>
         </content>
       </Tab>
