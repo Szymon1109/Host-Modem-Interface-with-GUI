@@ -60,15 +60,6 @@ public class Controller {
     private RadioButton BFSK;
 
     @FXML
-    private RadioButton BPSKcoded;
-
-    @FXML
-    private RadioButton QPSKcoded;
-
-    @FXML
-    private RadioButton BPSKpna;
-
-    @FXML
     private ToggleButton phyButton;
 
     @FXML
@@ -91,13 +82,13 @@ public class Controller {
         PHY, DL
     }
 
-    private static TYPE type = TYPE.DL;
-    private static MOD mod = MOD.B_PSK;
-    private static boolean fec = false;
-
-    private static STATE state = STATE.LOOK_4_BEGIN;
     private static int begin, len, cc, FCS_1, FCS_2, status;
-    private static Vector<Integer> data = new Vector<>();
+    private static Vector<Integer> data;
+    private static STATE state;
+
+    private static MOD mod;
+    private static boolean fec;
+    private static TYPE type;
 
     private ToggleGroup toggleGroupLay = new ToggleGroup();
     private ToggleGroup toggleGroupMod = new ToggleGroup();
@@ -123,9 +114,6 @@ public class Controller {
         QPSK.setToggleGroup(toggleGroupMod);
         eightPSK.setToggleGroup(toggleGroupMod);
         BFSK.setToggleGroup(toggleGroupMod);
-        BPSKcoded.setToggleGroup(toggleGroupMod);
-        QPSKcoded.setToggleGroup(toggleGroupMod);
-        BPSKpna.setToggleGroup(toggleGroupMod);
 
         phyButton.setToggleGroup(toggleGroupLay);
         dlButton.setToggleGroup(toggleGroupLay);
@@ -133,6 +121,14 @@ public class Controller {
 
     @FXML
     public void connect() {
+
+        mod = MOD.B_PSK;
+        fec = false;
+        type = TYPE.DL;
+
+        data = new Vector<>();
+        state = STATE.LOOK_4_BEGIN;
+
         SerialPort chosenPort = ports.getValue();
 
         if (chosenPort != null) {
@@ -279,9 +275,6 @@ public class Controller {
         QPSK.setDisable(bool);
         eightPSK.setDisable(bool);
         BFSK.setDisable(bool);
-        BPSKcoded.setDisable(bool);
-        QPSKcoded.setDisable(bool);
-        BPSKpna.setDisable(bool);
 
         phyButton.setDisable(bool);
         dlButton.setDisable(bool);
@@ -306,7 +299,6 @@ public class Controller {
         comPort.closePort();
 
         clear();
-
         setButtonsDisable(true);
     }
 
@@ -321,7 +313,6 @@ public class Controller {
         afterWrite();
 
         type = TYPE.DL;
-
         toggleGroupLay.selectToggle(dlButton);
     }
 
@@ -429,43 +420,36 @@ public class Controller {
         afterWrite();
     }
 
-    private int checkFirstByte(){
-        int firstByte;
+    private int checkFirstByte() {
 
-        if(fec){
-            firstByte = 1 << 3;
-        }
-        else{
-            firstByte = 0;
-        }
+        int firstByte = 0;
 
         switch (mod){
             case B_PSK:
-                firstByte |= 0b000;
                 break;
 
             case Q_PSK:
-                firstByte |= 0b001;
+                firstByte = 0b001;
                 break;
 
             case eight_PSK:
-                firstByte |= 0b010;
+                firstByte = 0b010;
                 break;
 
             case B_FSK:
-                firstByte |= 0b011;
+                firstByte = 0b011;
                 break;
 
             case B_PSK_coded:
-                firstByte |= 0b100;
+                firstByte = 0b100;
                 break;
 
             case Q_PSK_coded:
-                firstByte |= 0b101;
+                firstByte = 0b101;
                 break;
 
             case B_PSK_pna:
-                firstByte |= 0b111;
+                firstByte = 0b111;
                 break;
         }
 
@@ -489,36 +473,51 @@ public class Controller {
         RadioButton radioButton = (RadioButton) toggleGroupMod.getSelectedToggle();
         String selected = radioButton.getId();
 
-        switch (selected) {
+        if (!fec) {
+            switch (selected) {
+                case "BPSK":
+                    mod = MOD.B_PSK;
+                    break;
 
-            case "BPSK":
-                mod = MOD.B_PSK;
-                break;
+                case "QPSK":
+                    mod = MOD.Q_PSK;
+                    break;
 
-            case "QPSK":
-                mod = MOD.Q_PSK;
-                break;
+                case "eightPSK":
+                    mod = MOD.eight_PSK;
+                    break;
 
-            case "eightPSK":
-                mod = MOD.eight_PSK;
-                break;
-
-            case "BFSK":
-                mod = MOD.B_FSK;
-                break;
-
-            case "BPSKcoded":
-                mod = MOD.B_PSK_coded;
-                break;
-
-            case "QPSKcoded":
-                mod = MOD.Q_PSK_coded;
-                break;
-
-            case "BPSKpna":
-                mod = MOD.B_PSK_pna;
-                break;
+                case "BFSK":
+                    mod = MOD.B_FSK;
+                    break;
+            }
         }
+        else{
+            switch (selected) {
+                case "BPSK":
+                    mod = MOD.B_PSK_coded;
+                    break;
+
+                case "QPSK":
+                    mod = MOD.Q_PSK_coded;
+                    break;
+
+                case "eightPSK":
+                    mod = MOD.eight_PSK;
+                    break;
+
+                case "BFSK":
+                    mod = MOD.B_PSK_pna;
+                    break;
+            }
+        }
+    }
+
+    @FXML
+    public void changeFEC(){
+
+        fec = FEC.isSelected();
+        changeMod();
     }
 
     @FXML
@@ -558,11 +557,5 @@ public class Controller {
             comPort.writeBytes(phyBytes, phyBytes.length);
             afterWrite();
         }
-    }
-
-    @FXML
-    public void changeFEC(){
-
-        fec = FEC.isSelected();
     }
 }
