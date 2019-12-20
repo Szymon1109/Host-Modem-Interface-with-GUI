@@ -51,6 +51,27 @@ public class Frame {
         }
     }
 
+    public int checkFrame() {
+
+        if (begin == 0x02) {
+            int sumCorrect = FCS_1 + FCS_2;
+            int sumCalc = len + cc;
+
+            for (Integer getData : data) {
+                sumCalc += getData;
+            }
+
+            if (sumCorrect == sumCalc) {
+                return 1;
+
+            } else {
+                return -1;
+            }
+        } else {
+            return 0;
+        }
+    }
+
     public byte[] getBytes(){
 
         Vector<Integer> frame = new Vector<>();
@@ -79,27 +100,6 @@ public class Frame {
         }
 
         return frameBytes;
-    }
-
-    public int checkFrame() {
-
-        if (begin == 0x02) {
-            int sumCorrect = FCS_1 + FCS_2;
-            int sumCalc = len + cc;
-
-            for (Integer getData : data) {
-                sumCalc += getData;
-            }
-
-            if (sumCorrect == sumCalc) {
-                return 1;
-
-            } else {
-                return -1;
-            }
-        } else {
-            return 0;
-        }
     }
 
     public String toHexString() {

@@ -30,12 +30,6 @@ public class Controller {
     private Button resetButton;
 
     @FXML
-    private ToggleButton phyButton;
-
-    @FXML
-    private ToggleButton dlButton;
-
-    @FXML
     private TextField sendField;
 
     @FXML
@@ -75,6 +69,12 @@ public class Controller {
     private RadioButton BPSKpna;
 
     @FXML
+    private ToggleButton phyButton;
+
+    @FXML
+    private ToggleButton dlButton;
+
+    @FXML
     private CheckBox FEC;
 
     private enum STATE {
@@ -99,7 +99,8 @@ public class Controller {
     private static int begin, len, cc, FCS_1, FCS_2, status;
     private static Vector<Integer> data = new Vector<>();
 
-    private ToggleGroup toggleGroup = new ToggleGroup();
+    private ToggleGroup toggleGroupLay = new ToggleGroup();
+    private ToggleGroup toggleGroupMod = new ToggleGroup();
 
     private static final byte[] ACK = new byte[]{0x06};
     private static final byte[] NACK = new byte[]{0x15};
@@ -117,15 +118,17 @@ public class Controller {
     }
 
     private void setToggleGroup(){
-        BPSK.setSelected(true);
 
-        BPSK.setToggleGroup(toggleGroup);
-        QPSK.setToggleGroup(toggleGroup);
-        eightPSK.setToggleGroup(toggleGroup);
-        BFSK.setToggleGroup(toggleGroup);
-        BPSKcoded.setToggleGroup(toggleGroup);
-        QPSKcoded.setToggleGroup(toggleGroup);
-        BPSKpna.setToggleGroup(toggleGroup);
+        BPSK.setToggleGroup(toggleGroupMod);
+        QPSK.setToggleGroup(toggleGroupMod);
+        eightPSK.setToggleGroup(toggleGroupMod);
+        BFSK.setToggleGroup(toggleGroupMod);
+        BPSKcoded.setToggleGroup(toggleGroupMod);
+        QPSKcoded.setToggleGroup(toggleGroupMod);
+        BPSKpna.setToggleGroup(toggleGroupMod);
+
+        phyButton.setToggleGroup(toggleGroupLay);
+        dlButton.setToggleGroup(toggleGroupLay);
     }
 
     @FXML
@@ -259,6 +262,43 @@ public class Controller {
         javafx.application.Platform.runLater(() -> asciiField.appendText(asciiMessage));
     }
 
+    private void setButtonsDisable(boolean bool){
+
+        ports.setDisable(!bool);
+
+        connectButton.setDisable(!bool);
+        disconnectButton.setDisable(bool);
+        clearButton.setDisable(bool);
+        sendButton.setDisable(bool);
+        resetButton.setDisable(bool);
+
+        dataType.setDisable(bool);
+        dataType.setSelected(!bool);
+
+        BPSK.setDisable(bool);
+        QPSK.setDisable(bool);
+        eightPSK.setDisable(bool);
+        BFSK.setDisable(bool);
+        BPSKcoded.setDisable(bool);
+        QPSKcoded.setDisable(bool);
+        BPSKpna.setDisable(bool);
+
+        phyButton.setDisable(bool);
+        dlButton.setDisable(bool);
+
+        if(bool){
+            toggleGroupMod.selectToggle(null);
+            toggleGroupLay.selectToggle(null);
+        }
+        else{
+            toggleGroupMod.selectToggle(BPSK);
+            toggleGroupLay.selectToggle(dlButton);
+        }
+
+        FEC.setDisable(bool);
+        FEC.setSelected(false);
+    }
+
     @FXML
     public void disconnect() {
 
@@ -271,78 +311,37 @@ public class Controller {
     }
 
     @FXML
-    private void clear(){
+    public void reset(){
 
-        sendField.clear();
-        hexField.clear();
-        asciiField.clear();
+        Frame resetFrame = new Frame(0x00, 0x3c, new Vector<>());
+        byte[] resetBytes = resetFrame.getBytes();
+
+        beforeWrite();
+        comPort.writeBytes(resetBytes, resetBytes.length);
+        afterWrite();
+
+        type = TYPE.DL;
+
+        toggleGroupLay.selectToggle(dlButton);
     }
 
-    private void setButtonsDisable(boolean bool){
+    private void beforeWrite(){
 
-        ports.setDisable(!bool);
+        comPort.setRTS();
+        comPort.setDTR();
 
-        connectButton.setDisable(!bool);
-        disconnectButton.setDisable(bool);
-        clearButton.setDisable(bool);
-        sendButton.setDisable(bool);
-        resetButton.setDisable(bool);
+        try {
+            Thread.sleep(10);
 
-        phyButton.setDisable(bool);
-        phyButton.setSelected(false);
-        dlButton.setDisable(bool);
-        dlButton.setSelected(!bool);
-
-        dataType.setDisable(bool);
-        dataType.setSelected(!bool);
-    }
-
-    @FXML
-    public void setPhy(){
-
-        if(phyButton.isSelected()) {
-
-            type = TYPE.PHY;
-            dlButton.setSelected(false);
-
-            Vector<Integer> phyData = new Vector<>();
-            phyData.add(0x00);
-            phyData.add(0x10);
-
-            Frame phyFrame = new Frame(0x02, 0x08, phyData);
-            byte[] phyBytes = phyFrame.getBytes();
-
-            beforeWrite();
-            comPort.writeBytes(phyBytes, phyBytes.length);
-            afterWrite();
-        }
-        else {
-            phyButton.setSelected(true);
+        } catch(Exception e) {
+            e.printStackTrace();
         }
     }
 
-    @FXML
-    public void setDl(){
+    private void afterWrite(){
 
-        if(dlButton.isSelected()) {
-
-            type = TYPE.DL;
-            phyButton.setSelected(false);
-
-            Vector<Integer> dlData = new Vector<>();
-            dlData.add(0x00);
-            dlData.add(0x11);
-
-            Frame dlFrame = new Frame(0x02, 0x08, dlData);
-            byte[] dlBytes = dlFrame.getBytes();
-
-            beforeWrite();
-            comPort.writeBytes(dlBytes, dlBytes.length);
-            afterWrite();
-        }
-        else{
-            dlButton.setSelected(true);
-        }
+        comPort.clearRTS();
+        comPort.clearDTR();
     }
 
     @FXML
@@ -477,44 +476,17 @@ public class Controller {
     }
 
     @FXML
-    public void reset(){
+    private void clear(){
 
-        Frame resetFrame = new Frame(0x00, 0x3c, new Vector<>());
-        byte[] resetBytes = resetFrame.getBytes();
-
-        beforeWrite();
-        comPort.writeBytes(resetBytes, resetBytes.length);
-        afterWrite();
-
-        type = TYPE.DL;
-
-        phyButton.setSelected(false);
-        dlButton.setSelected(true);
-    }
-
-    private void beforeWrite(){
-
-        comPort.setRTS();
-        comPort.setDTR();
-
-        try {
-            Thread.sleep(10);
-
-        } catch(Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void afterWrite(){
-
-        comPort.clearRTS();
-        comPort.clearDTR();
+        sendField.clear();
+        hexField.clear();
+        asciiField.clear();
     }
 
     @FXML
     public void changeMod(){
 
-        RadioButton radioButton = (RadioButton) toggleGroup.getSelectedToggle();
+        RadioButton radioButton = (RadioButton) toggleGroupMod.getSelectedToggle();
         String selected = radioButton.getId();
 
         switch (selected) {
@@ -546,6 +518,45 @@ public class Controller {
             case "BPSKpna":
                 mod = MOD.B_PSK_pna;
                 break;
+        }
+    }
+
+    @FXML
+    public void changeLay(){
+
+        RadioButton radioButton = (RadioButton) toggleGroupLay.getSelectedToggle();
+        String selected = radioButton.getId();
+
+        if(selected.equals("dlButton")) {
+
+            type = TYPE.DL;
+
+            Vector<Integer> dlData = new Vector<>();
+            dlData.add(0x00);
+            dlData.add(0x11);
+
+            Frame dlFrame = new Frame(0x02, 0x08, dlData);
+            byte[] dlBytes = dlFrame.getBytes();
+
+            beforeWrite();
+            comPort.writeBytes(dlBytes, dlBytes.length);
+            afterWrite();
+        }
+
+        else if(selected.equals("phyButton")) {
+
+            type = TYPE.PHY;
+
+            Vector<Integer> phyData = new Vector<>();
+            phyData.add(0x00);
+            phyData.add(0x10);
+
+            Frame phyFrame = new Frame(0x02, 0x08, phyData);
+            byte[] phyBytes = phyFrame.getBytes();
+
+            beforeWrite();
+            comPort.writeBytes(phyBytes, phyBytes.length);
+            afterWrite();
         }
     }
 
