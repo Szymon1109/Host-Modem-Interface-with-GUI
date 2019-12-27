@@ -390,24 +390,16 @@ public class Controller {
         int firstByte = checkFirstByte();
         data.add(firstByte);
 
+        String fieldText = sendField.getText();
+
         if(!dataType.isSelected()){
-
-            String hexText = sendField.getText();
-            String asciiText = hexToAscii(hexText);
-            char[] chars = asciiText.toCharArray();
-
-            for(char getChar : chars){
-                data.add((int) getChar);
-            }
+            fieldText = hexToAscii(fieldText);
         }
 
-        else {
-            String asciiText = sendField.getText();
-            char[] chars = asciiText.toCharArray();
+        char[] chars = fieldText.toCharArray();
 
-            for(char getChar : chars){
-                data.add((int) getChar);
-            }
+        for(char getChar : chars){
+            data.add((int) getChar);
         }
 
         int len = data.size();
@@ -468,47 +460,48 @@ public class Controller {
     }
 
     @FXML
-    public void changeMod(){
+    public void changeMod() {
 
         RadioButton radioButton = (RadioButton) toggleGroupMod.getSelectedToggle();
         String selected = radioButton.getId();
 
-        if (!fec) {
-            switch (selected) {
-                case "BPSK":
-                    mod = MOD.B_PSK;
-                    break;
+        if (selected.equals("eightPSK")) {
+            mod = MOD.eight_PSK;
 
-                case "QPSK":
-                    mod = MOD.Q_PSK;
-                    break;
-
-                case "eightPSK":
-                    mod = MOD.eight_PSK;
-                    break;
-
-                case "BFSK":
-                    mod = MOD.B_FSK;
-                    break;
-            }
+            FEC.setSelected(false);
+            FEC.setDisable(true);
         }
-        else{
-            switch (selected) {
-                case "BPSK":
-                    mod = MOD.B_PSK_coded;
-                    break;
+        else {
+            FEC.setDisable(false);
 
-                case "QPSK":
-                    mod = MOD.Q_PSK_coded;
-                    break;
+            if (!fec) {
+                switch (selected) {
+                    case "BPSK":
+                        mod = MOD.B_PSK;
+                        break;
 
-                case "eightPSK":
-                    mod = MOD.eight_PSK;
-                    break;
+                    case "QPSK":
+                        mod = MOD.Q_PSK;
+                        break;
 
-                case "BFSK":
-                    mod = MOD.B_PSK_pna;
-                    break;
+                    case "BFSK":
+                        mod = MOD.B_FSK;
+                        break;
+                }
+            } else {
+                switch (selected) {
+                    case "BPSK":
+                        mod = MOD.B_PSK_coded;
+                        break;
+
+                    case "QPSK":
+                        mod = MOD.Q_PSK_coded;
+                        break;
+
+                    case "BFSK":
+                        mod = MOD.B_PSK_pna;
+                        break;
+                }
             }
         }
     }
