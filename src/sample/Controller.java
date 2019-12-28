@@ -82,6 +82,10 @@ public class Controller {
         PHY, DL
     }
 
+    private enum ANSWER{
+        ACK, NACK
+    }
+
     private static int begin, len, cc, FCS_1, FCS_2, status;
     private static Vector<Integer> data;
     private static STATE state;
@@ -221,10 +225,10 @@ public class Controller {
                                 int checkFrame = localFrame.checkFrame();
 
                                 if(checkFrame == 1){
-                                    comPort.writeBytes(ACK, 1);
+                                    sendAnswer(ANSWER.ACK);
                                 }
                                 else if(checkFrame == -1){
-                                    comPort.writeBytes(NACK, 1);
+                                    sendAnswer(ANSWER.NACK);
                                 }
 
                                 break;
@@ -292,6 +296,27 @@ public class Controller {
         FEC.setSelected(false);
     }
 
+    private void sendAnswer(ANSWER answer){
+
+        comPort.setDTR();
+
+        try {
+            Thread.sleep(10);
+        }
+        catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        if(answer == ANSWER.ACK) {
+            comPort.writeBytes(ACK, 1);
+        }
+        else if(answer == ANSWER.NACK){
+            comPort.writeBytes(NACK, 1);
+        }
+
+        comPort.clearDTR();
+    }
+
     @FXML
     public void disconnect() {
 
@@ -323,8 +348,8 @@ public class Controller {
 
         try {
             Thread.sleep(10);
-
-        } catch(Exception e) {
+        }
+        catch(Exception e) {
             e.printStackTrace();
         }
     }
